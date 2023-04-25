@@ -7,6 +7,7 @@ const URL = require("url").URL;
 const chalk = require("chalk");
 const log = console.log;
 const CG = require("console-grid");
+const ora = require("ora");
 
 let conf = {
   files: [],
@@ -25,26 +26,13 @@ if (process.argv.length <= 2) {
   log(chalk.red("文件夹获取失败，请在命令中添加文件夹路径参数"));
   return false;
 }
-// const folder = process.argv[2];
 
 // 开始载入文件
-const fullFilePath = process.argv[2];
-fileFilter(fullFilePath);
+const spinner = ora("开始压缩，载入文件").start();
+fileFilter(process.argv[2]);
 
 // 异步执行，每次收到回调后再执行下一个，避免触发频率限制🚫
 fileUpload();
-
-/**
- * 获取命令执行文件夹
- * 指令 -f
- * 参数 ./
- * 必填，待处理的图片文件夹
- */
-function getEntryFolder() {
-  let i = process.argv.findIndex((i) => i === "-f");
-  if (i === -1 || !process.argv[i + 1]) return err("获取命令执行文件夹：失败");
-  return process.argv[i + 1];
-}
 
 /**
  * 过滤待处理文件夹，得到待处理文件列表
@@ -108,11 +96,12 @@ function getAjaxOptions() {
  */
 function fileUpload() {
   if (conf.index >= conf.files.length) {
-    console.log("本次批量压缩结束");
+    spinner.succeed("本次批量压缩结束");
     print(conf.table);
     return false;
   }
   const imgPath = conf.files[conf.index];
+  spinner.text = `压缩第${conf.index + 1}张图片`;
   startTime = new Date().getTime();
   let req = https.request(getAjaxOptions(), (res) => {
     res.on("data", (buf) => {
@@ -127,7 +116,7 @@ function fileUpload() {
             input: `${(obj.input.size / 1024).toFixed(2)}KB`,
             output: `${(obj.output.size / 1024).toFixed(2)}KB`,
             ratio: `-%`,
-            time: "0",
+            time: 0,
           });
           conf.index = conf.index + 1;
           fileUpload();
@@ -185,7 +174,7 @@ function print(table) {
         chalk.green(item.output),
         !item.ratio ? chalk.red("0 %") : chalk.green(item.ratio),
         chalk.cyan(item.time + " ms"),
-        item.time === 0 ? chalk.green("success") : chalk.red("skip"),
+        item.time !== 0 ? chalk.green("success") : chalk.red("skip"),
       ]),
     ],
   });

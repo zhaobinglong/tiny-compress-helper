@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "chalk": "^4.0.0",
-    "console-grid": "^2.0.1"
+    "console-grid": "^2.0.1",
+    "ora": "^5.0.0"
   }
 }
