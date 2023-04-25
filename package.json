@@ -1,7 +1,8 @@
 {
   "name": "tiny-compress-helper",
-  "version": "1.0.0",
-  "description": "auto compress image by tinypng.com",
+  "version": "1.0.2",
+  "description": "a command line tool for you to compress image by tinypng.com",
+  "repository": "https://github.com/zhaobinglong/tiny-compress-helper",
   "main": "index.js",
   "bin": {
     "compress": "./bin/index.js"
@@ -9,6 +10,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+		"cli",
+    "command",
+    "tinypng",
+    "compress",
+    "terminal",
+    "images",
+    "front-end",
+    "nodejs"
+	],
   "author": "zhaobinglong",
   "license": "ISC",
   "dependencies": {
