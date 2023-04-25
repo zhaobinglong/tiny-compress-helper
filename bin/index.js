@@ -6,6 +6,7 @@ const https = require("https");
 const URL = require("url").URL;
 const chalk = require("chalk");
 const log = console.log;
+const CG = require("console-grid");
 
 let conf = {
   files: [],
@@ -14,13 +15,8 @@ let conf = {
   Exts: [".jpg", ".png", ".jpeg"],
   Max: 5200000, // 5MB == 5242848.754299136
   index: 0, // 当前处理的图片索引
+  table: [], // 输出的结果数据
 };
-
-console.log(process.argv);
-
-console.log(__dirname);
-console.log(__filename);
-console.log(path.dirname(__filename));
 
 // 获取用户输入的文件夹路径
 if (process.argv.length <= 2) {
@@ -32,8 +28,7 @@ if (process.argv.length <= 2) {
 // 开始载入文件
 const fullFilePath = process.argv[2];
 fileFilter(fullFilePath);
-console.log(conf.files);
-return false;
+
 // 异步执行，每次收到回调后再执行下一个，避免触发频率限制🚫
 fileUpload();
 
@@ -112,6 +107,7 @@ function getAjaxOptions() {
 function fileUpload() {
   if (conf.index >= conf.files.length) {
     console.log("本次批量压缩结束");
+    print(conf.table);
     return false;
   }
   const imgPath = conf.files[conf.index];
@@ -151,12 +147,19 @@ function downFile(entryImgPath, obj) {
     res.on("end", () => {
       fs.writeFile(entryImgPath, body, "binary", (err) => {
         if (err) return console.error(err);
-        let log = `✅压缩成功，`;
-        log += `优化比例: ${((1 - obj.output.ratio) * 100).toFixed(2)}% ，`;
-        log += `原始大小: ${(obj.input.size / 1024).toFixed(2)}KB,`;
-        log += `压缩大小: ${(obj.output.size / 1024).toFixed(2)}KB ,`;
-        log += `文件：${entryImgPath}`;
-        console.log(log);
+        // let log = `✅压缩成功，`;
+        // log += `优化比例: ${((1 - obj.output.ratio) * 100).toFixed(2)}% ，`;
+        // log += `原始大小: ${(obj.input.size / 1024).toFixed(2)}KB,`;
+        // log += `压缩大小: ${(obj.output.size / 1024).toFixed(2)}KB ,`;
+        // log += `文件：${entryImgPath}`;
+        // console.log(log);
+        conf.table.push({
+          path: entryImgPath,
+          input: `${(obj.input.size / 1024).toFixed(2)}KB`,
+          output: `${(obj.output.size / 1024).toFixed(2)}KB`,
+          ratio: `${((1 - obj.output.ratio) * 100).toFixed(2)}%`,
+          time: "",
+        });
         conf.index = conf.index + 1;
         fileUpload();
       });
@@ -164,4 +167,24 @@ function downFile(entryImgPath, obj) {
   });
   req.on("error", (e) => console.error(e));
   req.end();
+}
+
+// 打印表格
+function print(table) {
+  CG({
+    options: {
+      headerVisible: true,
+    },
+    columns: ["名称", "原体积", "现体积", "压缩率", "耗时", "状态"],
+    rows: [
+      ...table.map((item) => [
+        chalk.blue(item.path),
+        chalk.red(item.input),
+        chalk.green(item.output),
+        !item.ratio ? chalk.red("0 %") : chalk.green(item.ratio),
+        chalk.cyan(item.time + " ms"),
+        item.output ? chalk.green("success") : chalk.red("fail"),
+      ]),
+    ],
+  });
 }

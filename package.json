@@ -12,6 +12,7 @@
   "author": "zhaobinglong",
   "license": "ISC",
   "dependencies": {
-    "chalk": "^4.0.0"
+    "chalk": "^4.0.0",
+    "console-grid": "^2.0.1"
   }
 }
