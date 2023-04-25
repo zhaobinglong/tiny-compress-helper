@@ -18,6 +18,8 @@ let conf = {
   table: [], // 输出的结果数据
 };
 
+let startTime = 0; // 计算每条任务压缩耗时
+
 // 获取用户输入的文件夹路径
 if (process.argv.length <= 2) {
   log(chalk.red("文件夹获取失败，请在命令中添加文件夹路径参数"));
@@ -111,6 +113,7 @@ function fileUpload() {
     return false;
   }
   const imgPath = conf.files[conf.index];
+  startTime = new Date().getTime();
   let req = https.request(getAjaxOptions(), (res) => {
     res.on("data", (buf) => {
       let obj = JSON.parse(buf.toString());
@@ -119,8 +122,13 @@ function fileUpload() {
       } else {
         if (obj.output.ratio >= 0.9) {
           // 压缩比例过小，属于已经压缩过的文件，不再替换
-          console.log("跳过压缩");
-          console.log(obj.output);
+          conf.table.push({
+            path: conf.files[conf.index],
+            input: `${(obj.input.size / 1024).toFixed(2)}KB`,
+            output: `${(obj.output.size / 1024).toFixed(2)}KB`,
+            ratio: `-%`,
+            time: "0",
+          });
           conf.index = conf.index + 1;
           fileUpload();
         } else {
@@ -147,18 +155,12 @@ function downFile(entryImgPath, obj) {
     res.on("end", () => {
       fs.writeFile(entryImgPath, body, "binary", (err) => {
         if (err) return console.error(err);
-        // let log = `✅压缩成功，`;
-        // log += `优化比例: ${((1 - obj.output.ratio) * 100).toFixed(2)}% ，`;
-        // log += `原始大小: ${(obj.input.size / 1024).toFixed(2)}KB,`;
-        // log += `压缩大小: ${(obj.output.size / 1024).toFixed(2)}KB ,`;
-        // log += `文件：${entryImgPath}`;
-        // console.log(log);
         conf.table.push({
           path: entryImgPath,
           input: `${(obj.input.size / 1024).toFixed(2)}KB`,
           output: `${(obj.output.size / 1024).toFixed(2)}KB`,
           ratio: `${((1 - obj.output.ratio) * 100).toFixed(2)}%`,
-          time: "",
+          time: new Date().getTime() - startTime,
         });
         conf.index = conf.index + 1;
         fileUpload();
@@ -178,12 +180,12 @@ function print(table) {
     columns: ["名称", "原体积", "现体积", "压缩率", "耗时", "状态"],
     rows: [
       ...table.map((item) => [
-        chalk.blue(item.path),
+        chalk.blue(item.path.split("/").pop()),
         chalk.red(item.input),
         chalk.green(item.output),
         !item.ratio ? chalk.red("0 %") : chalk.green(item.ratio),
         chalk.cyan(item.time + " ms"),
-        item.output ? chalk.green("success") : chalk.red("fail"),
+        item.time === 0 ? chalk.green("success") : chalk.red("skip"),
       ]),
     ],
   });
