@@ -6,8 +6,8 @@
 🛠️ a command line tool for you to compress pictures based on tinypng.com
 
 ## Shots
-<div style="text-align: center">
-	<img style="width: 320px" src="shots/2.gif" alt="compress">
+<div align="center">
+	<img style="width: 50%" src="shots/2.gif" alt="compress">
 </div>
 
 ## Install
