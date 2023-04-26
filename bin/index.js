@@ -12,7 +12,7 @@ const ora = require("ora");
 let conf = {
   files: [],
   EntryFolder: "",
-  DeepLoop: false,
+  DeepLoop: true,
   Exts: [".jpg", ".png", ".jpeg"],
   Max: 5200000, // 5MB == 5242848.754299136
   index: 0, // 当前处理的图片索引
