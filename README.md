@@ -1,11 +1,7 @@
-<h1 align="center">
-	<br>
-	<br>
-	<img width="320" src="shots/1.png" alt="Chalk">
-	<br>
-	<br>
-	<br>
-</h1>
+<div align="center">
+	<img style="width: 100%" src="shots/1.png" alt="compress">
+</div>
+
 ## tiny-compress-helper
 compress your pictures by tinypng in cli
 
