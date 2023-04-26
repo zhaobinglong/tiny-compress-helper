@@ -3,7 +3,7 @@
 </div>
 
 ## tiny-compress-helper
-compress your pictures by tinypng in cli
+a command line tool for you to compress pictures based on tinypng.com
 
 
 ## Install
