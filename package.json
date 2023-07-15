@@ -1,7 +1,7 @@
 {
   "name": "tiny-compress-helper",
-  "version": "1.0.2",
-  "description": "a command line tool for you to compress image based on tinypng.com",
+  "version": "1.0.3",
+  "description": "🛠️ a command line tool for you to compress pictures based on tinypng.com",
   "repository": "https://github.com/zhaobinglong/tiny-compress-helper",
   "main": "index.js",
   "bin": {
@@ -21,7 +21,7 @@
     "nodejs"
 	],
   "author": "zhaobinglong",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "chalk": "^4.0.0",
     "console-grid": "^2.0.1",

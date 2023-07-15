@@ -13,7 +13,7 @@
 ## Install
 
 ```sh
-npm install tiny-compress-helper
+npm install tiny-compress-helper -g
 ```
 
 ## Usage
